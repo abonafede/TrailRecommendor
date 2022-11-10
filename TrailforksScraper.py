@@ -58,3 +58,27 @@ class trailforksScrapper:
             print(e)
 
         return self.data
+    
+    def fetchAllTrailsByRegion(self,region):
+        '''
+        Scrapes trails data from trailforks
+
+        Inputs:
+            region: name of region such as washington, north-carolina
+        Returns:
+            Dataframe containing trail data for a given region
+        '''
+
+        # Specify headers, url and params
+        search_url = self.url + '/region/' + region + '/trails/'
+        try:
+            # Request the page and use BeautifulSoup to extract the contents
+            page = requests.get(search_url)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            table = soup.find_all('table')
+            self.data = pd.read_html(str(table))[0]
+        except Exception as e:
+            print('Error occurred')
+            print(e)
+
+        return self.data
