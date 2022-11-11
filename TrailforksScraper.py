@@ -20,7 +20,7 @@ class trailforksScrapper:
         '''
 
         # Specify headers, url and params
-        search_url = self.url + 'region/united-states/?activitytype=6&z=10.4&lat=48.30699&lon=-120.42421&trailstyle=popularity'
+        search_url = self.url + '/region/united-states/trails/?sort=t.popularity_score&order=desc&difficulty=2,3,4,11,9,5,6,8&activitytype=6'
         try:
             # Get response
             response = requests.get(search_url)
