@@ -59,7 +59,7 @@ class trailforksScrapper:
 
         return self.data
     
-    def fetchAllTrailsByRegion(self,region):
+    def fetchTrailsByRegionAndPages(self,region,pages):
         '''
         Scrapes trails data from trailforks
 
@@ -70,13 +70,15 @@ class trailforksScrapper:
         '''
 
         # Specify headers, url and params
-        search_url = self.url + '/region/' + region + '/trails/'
         try:
-            # Request the page and use BeautifulSoup to extract the contents
-            page = requests.get(search_url)
-            soup = BeautifulSoup(page.content, 'html.parser')
-            table = soup.find_all('table')
-            self.data = pd.read_html(str(table))[0]
+            self.data = pd.DataFrame()
+            for page in range(0,pages):
+                search_url = self.url + '/region/' + region + '/trails/?activitytype=6&page=' + str(page) + '&sort=t.popularity_score&order=asc'
+                # Request the page and use BeautifulSoup to extract the contents
+                page = requests.get(search_url)
+                soup = BeautifulSoup(page.content, 'html.parser')
+                table = soup.find_all('table')
+                self.data = pd.concat([self.data,pd.read_html(str(table))[0]])
         except Exception as e:
             print('Error occurred')
             print(e)
