@@ -4,11 +4,12 @@ import sys
 from urllib import request, error
 
 
-def query(zipcode, start_date, end_date):
+def query(latitude, longitude, start_date, end_date):
     try:
         ResultBytes = request.urlopen(
             "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" +
-            f"{zipcode}/{start_date}/{end_date}?unitGroup=metric&key=KG4U6KJ7GSZYV59V8KA3CW7LQ&contentType=json")
+            f"{latitude},{longitude}/{start_date}/{end_date}?unitGroup=metric&key=KG4U6KJ7GSZYV59V8KA3CW7LQ&" +
+            "contentType=json")
         # Parse the results as JSON
         print(type(ResultBytes))
         json_data = json.loads(ResultBytes.read())
@@ -26,9 +27,10 @@ def query(zipcode, start_date, end_date):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Query weather data within the given date range')
-    parser.add_argument('zipcode', type=int, help='a valid US zipcode, in where the weather data would be queried')
+    parser.add_argument('latitude', type=float, help='a valid US latitude, where the weather data would be queried')
+    parser.add_argument('longitude', type=float, help='a valid US longitude, where the weather data would be queried')
     parser.add_argument('start_date', type=str, help='the start of the date range, must be in format yyyy-mm-dd')
     parser.add_argument('end_date', type=str, help='the end of the date range, must be in format yyyy-mm-dd')
 
     args = parser.parse_args()
-    print(query(str(args.zipcode), args.start_date, args.end_date))
+    print(query(str(args.latitude), str(args.longitude), args.start_date, args.end_date))
