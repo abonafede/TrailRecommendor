@@ -117,6 +117,9 @@ class trailforksScrapper:
             df = pd.read_csv(StringIO(checkins_per_month))
             checkins_per_month = df.iloc[:,:2]
             
+            # Extract checkins per hour
+            checkins = soup.find_all('div',class_='col-6 last')
+            
             self.data = pd.concat([checkins_per_year,checkins_per_month])
                 
         except Exception as e:
