@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 from io import StringIO
+import numpy as np
 
 
 class trailforksScrapper:
@@ -86,6 +87,14 @@ class trailforksScrapper:
 
         return self.data
     
+    def cleanUpCheckins(self,checkins, period):
+        checkins = checkins[checkins.index(period)-2:checkins.rindex(']')+1]
+        checkins = checkins.replace('[','').replace("'",'').replace(']','')
+        df = pd.read_csv(StringIO(checkins))
+        checkins = df.iloc[:,:2]
+        checkins = checkins.rename(columns=lambda x: x.strip())
+        return checkins
+        
     def fetchTrailStats(self,trail):
         '''
         Scrapes trails data from trailforks
@@ -103,34 +112,47 @@ class trailforksScrapper:
             # Request the page and use BeautifulSoup to extract the contents
             page = requests.get(search_url)
             soup = BeautifulSoup(page.content, 'html.parser')
-            checkins = soup.find_all('div',class_='col-6 last')
+            checkins = soup.find_all('div',class_='col-6')
             
             # Extract checkins per year
-            checkins_per_year = str(checkins[0])
-            checkins_per_year = checkins_per_year[checkins_per_year.index('Year')-2:checkins_per_year.rindex(']')+1]
-            df = pd.read_csv(StringIO(checkins_per_year))
-            checkins_per_year = df.iloc[:,:2]
-            
-            # Extract checkins per month
-            checkins_per_month = str(checkins[1])
-            checkins_per_month = checkins_per_month[checkins_per_month.index('Month')-2:checkins_per_month.rindex(']')+1]
-            df = pd.read_csv(StringIO(checkins_per_month))
-            checkins_per_month = df.iloc[:,:2]
+            checkins_per_hour = self.cleanUpCheckins(str(checkins[1]),'Year')
             
             # Extract checkins per hour
-            checkins = soup.find_all('div',class_='col-6 last')
+            checkins_per_year = self.cleanUpCheckins(str(checkins[2]),'Hour')
             
-            self.data = pd.concat([checkins_per_year,checkins_per_month])
+            # Extract checkins per month
+            checkins_per_month = self.cleanUpCheckins(str(checkins[3]),'Month')
+            
+            # Extract checkins per date
+            checkins = soup.find_all('div',class_='block')
+            for i in range(0,len(checkins)):
+                if "data.addColumn('date', 'Date')" in str(checkins[i]):
+                    checkins_per_date =  str(checkins[i])
+                    break;
+            checkins_per_date = checkins_per_date[checkins_per_date.index('new Date')-2:checkins_per_date.rindex(']')+1]
+            checkins_per_date = checkins_per_date.replace('[','').replace("'",'').replace(']','')
+            df = pd.read_csv(StringIO(checkins_per_date))
+            dates = np.add.reduce(df[df.iloc[:,:3].columns].astype(str), axis=1)
+            checkins = df.iloc[:,3]
+            checkins_per_date = pd.DataFrame({'Date':dates,'Check-Ins':checkins})
+            checkins_per_date = checkins_per_date[checkins_per_date['Date'].str.contains('new Date')]
+            checkins_per_date['Date'] = checkins_per_date['Date'].replace("new Date","",regex=True)
+            
+            df = pd.concat([checkins_per_year,checkins_per_month,checkins_per_hour,checkins_per_date])
+            df = df.dropna(subset=['Check-Ins'])
+            self.data = df
                 
         except Exception as e:
             print('Error occurred')
             print(e)
 
         return self.data
-    
+  
+# testing    
 s = trailforksScrapper()
-search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
+'''search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
 page = requests.get(search_url)
-soup = BeautifulSoup(page.content, 'html.parser')
-
-#print(s.fetchTrailStats('rattlesnake-ledge-trail'))
+soup = BeautifulSoup(page.content, 'html.parser')'''
+result = s.fetchTrailStats('rattlesnake-ledge-trail')
+print(result)
+#print(result['Date'].unique())'''
