@@ -103,16 +103,31 @@ class trailforksScrapper:
             # Request the page and use BeautifulSoup to extract the contents
             page = requests.get(search_url)
             soup = BeautifulSoup(page.content, 'html.parser')
-            checkins_per_year = str(soup.find('div',class_='col-6 last'))
+            checkins = soup.find_all('div',class_='col-6 last')
+            
+            # Extract checkins per year
+            checkins_per_year = str(checkins[0])
             checkins_per_year = checkins_per_year[checkins_per_year.index('Year')-2:checkins_per_year.rindex(']')+1]
-
             df = pd.read_csv(StringIO(checkins_per_year))
             checkins_per_year = df.iloc[:,:2]
-            #checkins_per_year.replace('[','',regex=True)
-            self.data = checkins_per_year
+            
+            # Extract checkins per month
+            checkins_per_month = str(checkins[1])
+            checkins_per_month = checkins_per_month[checkins_per_month.index('Month')-2:checkins_per_month.rindex(']')+1]
+            df = pd.read_csv(StringIO(checkins_per_month))
+            checkins_per_month = df.iloc[:,:2]
+            
+            self.data = pd.concat([checkins_per_year,checkins_per_month])
                 
         except Exception as e:
             print('Error occurred')
             print(e)
 
         return self.data
+    
+s = trailforksScrapper()
+search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
+page = requests.get(search_url)
+soup = BeautifulSoup(page.content, 'html.parser')
+
+#print(s.fetchTrailStats('rattlesnake-ledge-trail'))
