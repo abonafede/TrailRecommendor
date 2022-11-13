@@ -113,10 +113,10 @@ class trailforksScrapper:
             checkins = soup.find_all('div',class_='col-6')
             
             # Extract checkins per year
-            checkins_per_hour = self.cleanUpCheckins(str(checkins[1]),'Year')
+            checkins_per_hour = self.cleanUpCheckins(str(checkins[1]),'Hour')
             
             # Extract checkins per hour
-            checkins_per_year = self.cleanUpCheckins(str(checkins[2]),'Hour')
+            checkins_per_year = self.cleanUpCheckins(str(checkins[2]),'Year')
             
             # Extract checkins per month
             checkins_per_month = self.cleanUpCheckins(str(checkins[3]),'Month')
