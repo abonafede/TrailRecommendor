@@ -89,10 +89,8 @@ class trailforksScrapper:
     
     def cleanUpCheckins(self,checkins, period):
         checkins = checkins[checkins.index(period)-2:checkins.rindex(']')+1]
-        checkins = checkins.replace('[','').replace("'",'').replace(']','')
         df = pd.read_csv(StringIO(checkins))
-        checkins = df.iloc[:,:2]
-        checkins = checkins.rename(columns=lambda x: x.strip())
+        checkins = pd.DataFrame({'Period':df.iloc[:,0],'Check-Ins':df.iloc[:,1]})
         return checkins
         
     def fetchTrailStats(self,trail):
@@ -130,29 +128,34 @@ class trailforksScrapper:
                     checkins_per_date =  str(checkins[i])
                     break;
             checkins_per_date = checkins_per_date[checkins_per_date.index('new Date')-2:checkins_per_date.rindex(']')+1]
-            checkins_per_date = checkins_per_date.replace('[','').replace("'",'').replace(']','')
             df = pd.read_csv(StringIO(checkins_per_date))
             dates = np.add.reduce(df[df.iloc[:,:3].columns].astype(str), axis=1)
             checkins = df.iloc[:,3]
-            checkins_per_date = pd.DataFrame({'Date':dates,'Check-Ins':checkins})
-            checkins_per_date = checkins_per_date[checkins_per_date['Date'].str.contains('new Date')]
-            checkins_per_date['Date'] = checkins_per_date['Date'].replace("new Date","",regex=True)
+            checkins_per_date = pd.DataFrame({'Period':dates,'Check-Ins':checkins})
+            checkins_per_date = checkins_per_date[checkins_per_date['Period'].str.contains('new Date')]
+            checkins_per_date['Period'] = checkins_per_date['Period'].replace("new Date","",regex=True)
+            checkins_per_date['Check-Ins'] = checkins_per_date['Check-Ins'].str.replace('\W', '')
             
             df = pd.concat([checkins_per_year,checkins_per_month,checkins_per_hour,checkins_per_date])
-            df = df.dropna(subset=['Check-Ins'])
+            df['Period'] = df['Period'].str.replace('\W', '')
+            df = df.dropna()
             self.data = df
                 
         except Exception as e:
-            print('Error occurred')
-            print(e)
+            #print('Error occurred')
+            #print(e)
+            return
 
         return self.data
   
 # testing    
-s = trailforksScrapper()
-'''search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
+'''s = trailforksScrapper()
+search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
 page = requests.get(search_url)
-soup = BeautifulSoup(page.content, 'html.parser')'''
+soup = BeautifulSoup(page.content, 'html.parser')
 result = s.fetchTrailStats('rattlesnake-ledge-trail')
 print(result)
+#result = result.fillna('')
+#result = pd.DataFrame({'Period':np.add.reduce(result[['Hour','Month','Year','Date']].astype(str), axis=1),'Check-Ins':result['Check-Ins']})
+#print(result)
 #print(result['Date'].unique())'''
