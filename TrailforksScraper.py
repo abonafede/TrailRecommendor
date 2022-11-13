@@ -148,14 +148,19 @@ class trailforksScrapper:
 
         return self.data
   
-# testing    
-'''s = trailforksScrapper()
-search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
-page = requests.get(search_url)
-soup = BeautifulSoup(page.content, 'html.parser')
-result = s.fetchTrailStats('rattlesnake-ledge-trail')
-print(result)
-#result = result.fillna('')
-#result = pd.DataFrame({'Period':np.add.reduce(result[['Hour','Month','Year','Date']].astype(str), axis=1),'Check-Ins':result['Check-Ins']})
-#print(result)
-#print(result['Date'].unique())'''
+
+
+if __name__ == '__main__': # testing 
+    s = trailforksScrapper()
+    # popularity_df = s.fetchTrailPopularity()
+    # print(popularity_df)
+    # print("------------------------------------------------")
+    search_url = 'https://www.trailforks.com/trails/rattlesnake-ledge-trail/stats/'
+    page = requests.get(search_url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    result = s.fetchTrailStats('rattlesnake-ledge-trail')
+    print(result)
+    result = result.fillna('')
+    result = pd.DataFrame({'Period':np.add.reduce(result[['Hour','Month','Year','Date']].astype(str), axis=1),'Check-Ins':result['Check-Ins']})
+    print(result)
+    print(result['Date'].unique())
