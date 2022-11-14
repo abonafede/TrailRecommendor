@@ -137,7 +137,7 @@ class trailforksScrapper:
             checkins_per_date['Check-Ins'] = checkins_per_date['Check-Ins'].str.replace('\W', '')
             
             df = pd.concat([checkins_per_year,checkins_per_month,checkins_per_hour,checkins_per_date])
-            df['Period'] = df['Period'].str.replace('\W', '')
+            df['Period'] = df['Period'].str.replace('\W', '',regex=True)
             df = df.dropna()
             self.data = df
                 
