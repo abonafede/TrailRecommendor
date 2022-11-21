@@ -4,6 +4,7 @@ import streamlit as st
 from datetime import date, time
 from scripts.recommendation import get_trails
 
+
 placeholder = st.empty()
 
 with placeholder.container():
