@@ -1,3 +1,6 @@
+# This script creates predictions using knn clustering on our 
+# combined dataset for all the washington trails
+
 import pandas as pd
 import numpy as np
 import pgeocode # pip3 install pgeocode
