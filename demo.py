@@ -1,3 +1,6 @@
+# This script is to run trail recommendation demo on streamlit.
+# Run command streamlit run demo.py will open a window to endter our inputs.
+
 import pandas as pd
 import numpy as np 
 import streamlit as st 

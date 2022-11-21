@@ -1,6 +1,8 @@
+# This script uses APIs on https://www.visualcrossing.com/ to get reports on date and hour
+# given a particular location.
+
 import json
 from datetime import datetime
-
 import pandas as pd
 from urllib import request, error
 
