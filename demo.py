@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np 
 import streamlit as st 
 from datetime import date, time
-from recommendation import get_trails
+from scripts.recommendation import get_trails
+
 
 placeholder = st.empty()
 
