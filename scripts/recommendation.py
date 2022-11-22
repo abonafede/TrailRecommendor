@@ -45,7 +45,7 @@ def convertDist(dist):
     else: return int(dist[:-3].replace(',', ''))
 
 def get_trails(zipcode, radius, hour_of_day):
-    df_raw = pd.read_csv('combined-trails-w-weather.csv.zip', compression='zip')
+    df_raw = pd.read_csv('data files/combined-trails-w-weather.csv.zip', compression='zip')
     feature_kept = ['TITLE', 'REGION', 'LATITUDE', 'LONGITUDE', 'URL', 'riding area', \
                 'distance', 'descent', 'climb', 'popularity_score', 'GAIN', 'HIGHEST', \
                     'RATING', 'RATING_COUNT', 'Period', 'Check-Ins', 'weather']
@@ -86,4 +86,5 @@ def get_trails(zipcode, radius, hour_of_day):
     df_final = df_final.loc[df_final['final_label'] == highestRatingCenterLabel]   
     df_final = df_final.sort_values(by=['RATING'], ascending=False) 
     df_final = df_final.rename(columns={"LATITUDE": "latitude", "LONGITUDE": "longitude"})
+    df_final = df_final.drop_duplicates(subset=['TITLE'])
     return df_final.head(3)
